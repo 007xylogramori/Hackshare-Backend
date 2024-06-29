@@ -31,7 +31,8 @@ const userSchema = new Schema(
         },
         refreshToken: {
             type: String
-        }
+        },
+        teams: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Team' }]
     },
     {
         timestamps: true

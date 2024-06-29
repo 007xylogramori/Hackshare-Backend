@@ -17,9 +17,10 @@ app.use(cookieParser())
 
 import userRouter from './routes/user.routes.js'
 import healthcheckRouter from "./routes/healthcheck.routes.js"
+import teamRouter from './routes/team.routes.js'
 
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/users", userRouter)
-
+app.use("/api/v1/teams", teamRouter)
 
 export { app }
