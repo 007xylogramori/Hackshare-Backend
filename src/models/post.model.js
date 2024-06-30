@@ -4,7 +4,6 @@ const postSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true,
   },
   description: {
     type: String,
@@ -20,11 +19,19 @@ const postSchema = new mongoose.Schema({
     ref: 'Team',
     required: true,
   },
-  likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  }],
-}, { timestamps: true });
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
+  link: {
+    type: String,
+    default: null,
+  },
+}, {
+  timestamps: true,
+});
 
 const Post = mongoose.model('Post', postSchema);
 

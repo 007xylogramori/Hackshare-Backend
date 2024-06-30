@@ -4,7 +4,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
 export const createPost = asyncHandler(async (req, res) => {
-  const { title, description, teamId } = req.body;
+  const { title, description, teamId, link } = req.body;
 
   if (!title || !description || !teamId) {
     throw new ApiError(400, 'Title, description, and team ID are required.');
@@ -15,6 +15,7 @@ export const createPost = asyncHandler(async (req, res) => {
     description,
     user: req.user._id,
     team: teamId,
+    link: link || null,
   });
 
   await post.save();
@@ -48,7 +49,7 @@ export const getPostDetails = asyncHandler(async (req, res) => {
 
 export const updatePost = asyncHandler(async (req, res) => {
   const { postId } = req.params;
-  const { title, description } = req.body;
+  const { title, description, link } = req.body;
 
   const post = await Post.findById(postId);
 
@@ -62,6 +63,7 @@ export const updatePost = asyncHandler(async (req, res) => {
 
   post.title = title || post.title;
   post.description = description || post.description;
+  post.link = link || post.link;
 
   await post.save();
 
