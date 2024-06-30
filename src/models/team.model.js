@@ -29,7 +29,13 @@ const teamSchema = new Schema(
                 type: String,
                 default: 'member'
             }
-        }]
+        }],
+        githubRepos: [
+            {
+                name: { type: String, required: true },
+                url: { type: String, required: true },
+            },
+        ]
     },
     {
         timestamps: true

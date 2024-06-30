@@ -4,7 +4,7 @@ import { Team } from "../models/team.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import crypto from "crypto";
 import { User } from "../models/user.model.js";
-
+import { extractOwnerAndRepo } from "../utils/githubUrl.js";
 const createTeam = asyncHandler(async (req, res) => {
   const { name } = req.body;
 
@@ -204,6 +204,36 @@ const deleteTeam = asyncHandler(async (req, res) => {
   }
 });
 
+const addGithubRepo = asyncHandler(async (req, res) => {
+  const { teamId, repoUrl } = req.body;
+
+  if (!teamId || !repoUrl) {
+      throw new ApiError(400, "Team ID and repository URL are required");
+  }
+
+  try {
+      const { owner, repoName } = extractOwnerAndRepo(repoUrl);
+      console.log(owner,repoName)
+      const team = await Team.findById(teamId);
+      if (!team) {
+          throw new ApiError(404, "Team not found");
+      }
+
+      if (!team.owner.equals(req.user._id)) {
+          throw new ApiError(403, "Only the team owner can add repositories");
+      }
+
+      const repo = { name: repoName, url: repoUrl };
+
+      team.githubRepos.push(repo);
+      await team.save();
+
+      res.status(200).json(new ApiResponse(200, team, "Repository added successfully"));
+  } catch (error) {
+      throw new ApiError(500, "Something went wrong while adding the repository");
+  }
+});
+
 export {
   createTeam,
   joinTeam,
@@ -211,4 +241,5 @@ export {
   getTeams,
   getTeamDetails,
   deleteTeam,
+  addGithubRepo
 };
