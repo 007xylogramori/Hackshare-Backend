@@ -19,10 +19,12 @@ import userRouter from './routes/user.routes.js'
 import healthcheckRouter from "./routes/healthcheck.routes.js"
 import teamRouter from './routes/team.routes.js'
 import resourceRouter from './routes/resource.routes.js'
+import postRouter from './routes/post.routes.js'
 
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/teams", teamRouter)
 app.use('/api/v1/resources', resourceRouter);
+app.use('/api/v1/posts', postRouter);
 
 export { app }
