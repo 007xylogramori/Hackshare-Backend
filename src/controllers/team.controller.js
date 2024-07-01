@@ -129,10 +129,11 @@ const manageMembers = asyncHandler(async (req, res) => {
 
 const getTeams = asyncHandler(async (req, res) => {
   try {
-    const teams = await Team.find({ owner: req.user._id }).populate(
-      "members.user",
+    const teams = await Team.find({ "members.user": req.user._id }).populate(
+      "owner",
       "username email fullName"
-    );
+    ); 
+
     const teamCount = teams.length;
 
     res
@@ -208,29 +209,31 @@ const addGithubRepo = asyncHandler(async (req, res) => {
   const { teamId, repoUrl } = req.body;
 
   if (!teamId || !repoUrl) {
-      throw new ApiError(400, "Team ID and repository URL are required");
+    throw new ApiError(400, "Team ID and repository URL are required");
   }
 
   try {
-      const { owner, repoName } = extractOwnerAndRepo(repoUrl);
-      console.log(owner,repoName)
-      const team = await Team.findById(teamId);
-      if (!team) {
-          throw new ApiError(404, "Team not found");
-      }
+    const { owner, repoName } = extractOwnerAndRepo(repoUrl);
+    console.log(owner, repoName);
+    const team = await Team.findById(teamId);
+    if (!team) {
+      throw new ApiError(404, "Team not found");
+    }
 
-      if (!team.owner.equals(req.user._id)) {
-          throw new ApiError(403, "Only the team owner can add repositories");
-      }
+    if (!team.owner.equals(req.user._id)) {
+      throw new ApiError(403, "Only the team owner can add repositories");
+    }
 
-      const repo = { name: repoName, url: repoUrl };
+    const repo = { name: repoName, url: repoUrl };
 
-      team.githubRepos.push(repo);
-      await team.save();
+    team.githubRepos.push(repo);
+    await team.save();
 
-      res.status(200).json(new ApiResponse(200, team, "Repository added successfully"));
+    res
+      .status(200)
+      .json(new ApiResponse(200, team, "Repository added successfully"));
   } catch (error) {
-      throw new ApiError(500, "Something went wrong while adding the repository");
+    throw new ApiError(500, "Something went wrong while adding the repository");
   }
 });
 
@@ -241,5 +244,5 @@ export {
   getTeams,
   getTeamDetails,
   deleteTeam,
-  addGithubRepo
+  addGithubRepo,
 };

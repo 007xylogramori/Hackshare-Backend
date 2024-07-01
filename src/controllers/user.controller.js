@@ -66,8 +66,7 @@ const registerUser = asyncHandler( async (req, res) => {
 const loginUser = asyncHandler(async (req, res) =>{
 
     const {email, username, password} = req.body
-    console.log(email);
-
+    
     if (!username && !email) {
         throw new ApiError(400, "username or email is required")
     }
@@ -75,21 +74,22 @@ const loginUser = asyncHandler(async (req, res) =>{
     const user = await User.findOne({
         $or: [{username}, {email}]
     })
-
+    
     if (!user) {
         throw new ApiError(404, "User does not exist")
     }
-
-   const isPasswordValid = await user.isPasswordCorrect(password)
-
-   if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid user credentials")
+    
+    const isPasswordValid = await user.isPasswordCorrect(password)
+    
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Invalid user credentials")
     }
-
-   const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id)
-
+    
+    console.log(email);
+    const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id)
+    
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
-
+    
     const options = { httpOnly: true,secure:true, sameSite:'None'}
 
     return res
@@ -209,8 +209,8 @@ const getCurrentUser = asyncHandler(async(req, res) => {
 })
 
 const updateAccountDetails = asyncHandler(async(req, res) => {
-    const {fullName, email} = req.body
-
+    console.log("helo")
+    const {fullName, email , bio} = req.body
     if (!fullName || !email) {
         throw new ApiError(400, "All fields are required")
     }
@@ -220,7 +220,8 @@ const updateAccountDetails = asyncHandler(async(req, res) => {
         {
             $set: {
                 fullName,
-                email: email
+                email: email,
+                bio
             }
         },
         {new: true}
