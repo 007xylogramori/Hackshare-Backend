@@ -132,7 +132,7 @@ const getTeams = asyncHandler(async (req, res) => {
     const teams = await Team.find({ "members.user": req.user._id }).populate(
       "owner",
       "username email fullName"
-    ); 
+    );
 
     const teamCount = teams.length;
 
@@ -158,10 +158,9 @@ const getTeamDetails = asyncHandler(async (req, res) => {
   }
 
   try {
-    const team = await Team.findById(teamId).populate(
-      "members.user",
-      "username email fullName"
-    );
+    const team = await Team.findById(teamId)
+      .populate("owner", "username email fullName")
+      .populate("members.user", "username email fullName");
     if (!team) {
       throw new ApiError(404, "Team not found");
     }
@@ -237,6 +236,44 @@ const addGithubRepo = asyncHandler(async (req, res) => {
   }
 });
 
+const leaveTeam = asyncHandler(async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    console.log(req.params.team)
+    if (!teamId) {
+      throw new ApiError(400, "Team ID is required");
+    }
+
+    const team = await Team.findById(teamId)
+    if (!team) {
+      throw new ApiError(404, "Team not found");
+    }
+    
+    const isMember = team.members.some((member) =>
+      member.user.equals(req.user._id)
+    );
+    
+    if (!isMember) {
+      throw new ApiError(400, "You are not a member of this team");
+    }
+
+    team.members = team.members.filter(
+      (member) => !member.user.equals(req.user._id)
+    );
+    await team.save();
+
+    const user = await User.findById(req.user._id);
+    user.teams = user.teams.filter((team) => !team.equals(teamId));
+    await user.save();
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, {}, "You have successfully left the team"));
+  } catch (error) {
+    throw new ApiError(400, "You are not a member of this team");
+  }
+});
+
 export {
   createTeam,
   joinTeam,
@@ -245,4 +282,5 @@ export {
   getTeamDetails,
   deleteTeam,
   addGithubRepo,
+  leaveTeam
 };
