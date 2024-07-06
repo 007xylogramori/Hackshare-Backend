@@ -17,8 +17,6 @@ export const generateResponse = asyncHandler(async (req, res) => {
 
     const text = response.text();
 
-    console.log(text);
-
     if (!title || !description || !teamId) {
       throw new ApiError(400, "Title, description, and team ID are required.");
     }

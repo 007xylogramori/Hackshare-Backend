@@ -213,11 +213,11 @@ const addGithubRepo = asyncHandler(async (req, res) => {
 
   try {
     const { owner, repoName } = extractOwnerAndRepo(repoUrl);
-    console.log(owner, repoName);
     const team = await Team.findById(teamId);
     if (!team) {
       throw new ApiError(404, "Team not found");
     }
+    console.log(owner, repoName);
 
     if (!team.owner.equals(req.user._id)) {
       throw new ApiError(403, "Only the team owner can add repositories");
@@ -227,7 +227,7 @@ const addGithubRepo = asyncHandler(async (req, res) => {
 
     team.githubRepos.push(repo);
     await team.save();
-
+    console.log(repoUrl)
     res
       .status(200)
       .json(new ApiResponse(200, team, "Repository added successfully"));
