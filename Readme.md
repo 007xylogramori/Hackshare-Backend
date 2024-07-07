@@ -80,4 +80,5 @@ Find out related api endpoints on the given link.
 
 ## Screenshots
 
-![App Screenshot](https://drive.google.com/file/d/1BxmwDfoBqPu5eY7LoF-SknnwKvJavICz/view?pli=1)
+![Screenshot 2024-07-07 153736](https://github.com/007xylogramori/Hackshare-Backend/assets/119863801/eb026b76-5e4c-47d9-b2f2-fbf22488c4c5)
+
