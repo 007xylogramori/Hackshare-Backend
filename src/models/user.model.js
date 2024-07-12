@@ -27,7 +27,7 @@ const userSchema = new Schema(
     },
     bio: {
       type: String,
-      default:""
+      default: "",
     },
     password: {
       type: String,
@@ -35,6 +35,14 @@ const userSchema = new Schema(
     },
     refreshToken: {
       type: String,
+    },
+    profilePicture: {
+      type: String,
+      default: "",
+    },
+    coverPicture: {
+      type: String,
+      default: "",
     },
     teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Team" }],
   },
