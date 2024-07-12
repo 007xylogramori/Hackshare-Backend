@@ -67,14 +67,14 @@ const likePost = asyncHandler(async (req, res) => {
 const getPosts = asyncHandler(async (req, res) => {
     const { tags } = req.query;
     const filter = tags ? { tags: { $in: tags.split(',') } } : {};
-    const posts = await CommunityPost.find(filter).populate('user', 'username').populate('comments.user', 'username');
+    const posts = await CommunityPost.find(filter).populate('user','profilePicture username').populate('comments.user', 'username',);
     res.status(200).json(new ApiResponse(200, posts, "Posts fetched successfully"));
 });
 
 // Get a single post by ID
 const getPostById = asyncHandler(async (req, res) => {
     const { postId } = req.params;
-    const post = await CommunityPost.findById(postId).populate('user', 'username').populate('comments.user', 'username');
+    const post = await CommunityPost.findById(postId).populate('user', 'username profilePicture').populate('comments.user', 'username' ,);
 
     if (!post) {
         throw new ApiError(404, "Post not found");
