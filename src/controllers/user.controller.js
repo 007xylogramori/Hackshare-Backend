@@ -94,12 +94,26 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = { httpOnly: true, secure: true, sameSite: "None" };
+  const accessTokenExpiryDate = new Date(Date.now() + 2* 24 * 60 * 60 * 1000); // 1 day
+  const refreshTokenExpiryDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000); // 10 days
 
+  const accessOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    expires: accessTokenExpiryDate,
+  };
+
+  const refreshOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    expires: refreshTokenExpiryDate,
+  };
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, accessOptions)
+    .cookie("refreshToken", refreshToken, refreshOptions)
     .json(
       new ApiResponse(
         200,
