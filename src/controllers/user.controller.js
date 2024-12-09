@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import fs from 'fs';
+import fs from "fs";
 import {
   deleteFromCloudinary,
   uploadOnCloudinary,
@@ -94,20 +94,22 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const accessTokenExpiryDate = new Date(Date.now() + 2* 24 * 60 * 60 * 1000); // 1 day
-  const refreshTokenExpiryDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000); // 10 days
+  const accessTokenExpiryDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000); // 1 day
+  const refreshTokenExpiryDate = new Date(
+    Date.now() + 10 * 24 * 60 * 60 * 1000
+  ); // 10 days
 
   const accessOptions = {
     httpOnly: true,
     secure: true,
-    sameSite: 'None',
+    sameSite: "None",
     expires: accessTokenExpiryDate,
   };
 
   const refreshOptions = {
     httpOnly: true,
     secure: true,
-    sameSite: 'None',
+    sameSite: "None",
     expires: refreshTokenExpiryDate,
   };
   return res
@@ -359,6 +361,28 @@ const deleteCoverPicture = asyncHandler(async (req, res) => {
   }
 });
 
+const updateSocials = asyncHandler(async (req, res) => {
+  const { github, linkedin, facebook, behance } = req.body;
+  try {
+    const user = await User.findById(req.user._id);
+    user.socials = {
+      github: github || user.socials.github,
+      linkedin: linkedin || user.socials.linkedin,
+      facebook: facebook || user.socials.facebook,
+      behance: behance || user.socials.behance,
+    };
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Socials updated successfully",
+      data: user,
+    });
+  } catch (error) {
+    throw new ApiError(500, error.message || "Failed to update socials");
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -370,5 +394,6 @@ export {
   uploadProfilePicture,
   deleteProfilePicture,
   uploadCoverPicture,
-  deleteCoverPicture
+  deleteCoverPicture,
+  updateSocials,
 };

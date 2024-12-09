@@ -45,6 +45,12 @@ const userSchema = new Schema(
       default: "",
     },
     teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Team" }],
+    socials: {
+      github: { type: String, trim: true, default: "" },
+      linkedin: { type: String, trim: true, default: "" },
+      facebook: { type: String, trim: true, default: "" },
+      behance: { type: String, trim: true, default: "" },
+    }
   },
   {
     timestamps: true,

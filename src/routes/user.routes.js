@@ -11,6 +11,7 @@ import {
   deleteProfilePicture,
   uploadCoverPicture,
   deleteCoverPicture,
+  updateSocials
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -30,5 +31,7 @@ router.route("/upload-profile-picture").post(verifyJWT, upload.single('profilePi
 router.route("/delete-profile-picture").delete(verifyJWT, deleteProfilePicture);
 router.route("/upload-cover-picture").post(verifyJWT, upload.single('coverPicture'), uploadCoverPicture);
 router.route("/delete-cover-picture").delete(verifyJWT, deleteCoverPicture);
+router.route("/socials").post(verifyJWT,updateSocials);
+
 
 export default router;
