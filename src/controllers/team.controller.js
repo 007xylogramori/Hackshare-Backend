@@ -192,10 +192,7 @@ const deleteTeam = asyncHandler(async (req, res) => {
       { _id: { $in: team.members.map((member) => member.user) } },
       { $pull: { teams: team._id } }
     );
-    console.log(updateResult.ok, "users deleted");
-    await Team.findByIdAndDelete(teamId).then(() => {
-      console.log("team deleted");
-    });
+    await Team.findByIdAndDelete(teamId)
 
     res.status(200).json(new ApiResponse(200, {}, "Team deleted successfully"));
   } catch (error) {
@@ -210,24 +207,24 @@ const addGithubRepo = asyncHandler(async (req, res) => {
   if (!teamId || !repoUrl) {
     throw new ApiError(400, "Team ID and repository URL are required");
   }
-
+  
   try {
     const { owner, repoName } = extractOwnerAndRepo(repoUrl);
     const team = await Team.findById(teamId);
     if (!team) {
       throw new ApiError(404, "Team not found");
     }
-    console.log(owner, repoName);
+    
 
-    if (!team.owner.equals(req.user._id)) {
-      throw new ApiError(403, "Only the team owner can add repositories");
-    }
+    // if (!team.owner.equals(req.user._id)) {
+    //   throw new ApiError(403, "Only the team owner can add repositories");
+    // }
 
     const repo = { name: repoName, url: repoUrl };
 
     team.githubRepos.push(repo);
     await team.save();
-    console.log(repoUrl)
+    
     res
       .status(200)
       .json(new ApiResponse(200, team, "Repository added successfully"));
@@ -236,10 +233,47 @@ const addGithubRepo = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteGithubRepo = asyncHandler(async (req, res) => {
+  const { teamId, repoId } = req.query;
+
+  if (!teamId || !repoId) {
+    throw new ApiError(400, "Team ID and repository ID are required");
+  }
+
+  try {
+    const team = await Team.findById(teamId);
+    if (!team) {
+      throw new ApiError(404, "Team not found");
+    }
+
+
+    // Find and remove the repository
+    const repoIndex = team.githubRepos.findIndex(
+      (repo) => repo._id.toString() === repoId
+    );
+
+    if (repoIndex === -1) {
+      throw new ApiError(404, "Repository not found");
+    }
+
+    team.githubRepos.splice(repoIndex, 1);
+    await team.save();
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, team, "Repository deleted successfully"));
+  } catch (error) {
+    throw new ApiError(500, "Something went wrong while deleting the repository");
+  }
+});
+
+
+
+
 const leaveTeam = asyncHandler(async (req, res) => {
   try {
     const { teamId } = req.params;
-    console.log(req.params.team)
+    
     if (!teamId) {
       throw new ApiError(400, "Team ID is required");
     }
@@ -282,5 +316,6 @@ export {
   getTeamDetails,
   deleteTeam,
   addGithubRepo,
-  leaveTeam
+  leaveTeam,
+  deleteGithubRepo
 };

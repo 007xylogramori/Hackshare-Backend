@@ -6,7 +6,6 @@ import { genAI } from "../utils/Gemini.config.js";
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 export const generateResponse = asyncHandler(async (req, res) => {
-  console.log(req.body)
   try {
     const { title, description, teamId } = req.body;
 
@@ -26,7 +25,7 @@ export const generateResponse = asyncHandler(async (req, res) => {
       .status(201)
       .json(new ApiResponse(201, text, "Post created successfully."));
   } catch (error) {
-    console.log(error)
+    console.log("GEN AI ERROR : \n",error)
     throw new ApiError(400, "error occured");
   }
 });

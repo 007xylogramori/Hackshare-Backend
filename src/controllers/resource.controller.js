@@ -26,7 +26,7 @@ export const uploadResource = asyncHandler(async (req, res) => {
     if (!response) {
       throw new ApiError(500, "File upload failed.");
     }
-    console.log(response);
+    
 
     const newResource = new Resource({
       url: response.url,
@@ -102,10 +102,15 @@ export const getResourcesByType = asyncHandler(async (req, res) => {
   }
 
   try {
-    const resources = await Resource.find({ team: teamId, filetype }).populate(
-      "user",
-      "username email fullName"
-    );
+    const resources = await Resource.find({ team: teamId, filetype })
+  .populate("user", "username email fullName")
+  .populate({
+    path: "team",
+    populate: {
+      path: "owner",
+      select: "username email fullName",
+    },
+  });
     res
       .status(200)
       .json(new ApiResponse(200, resources, "Resources fetched successfully."));
@@ -122,14 +127,19 @@ export const deleteResource = asyncHandler(async (req, res) => {
   }
 
   try {
-    const resource = await Resource.findById(resourceId);
+    const resource = await Resource.findById(resourceId).populate("user", "username email fullName")
+    .populate({
+      path: "team",
+      populate: {
+        path: "owner",
+        select: "username email fullName",
+      },
+    });
     if (!resource) {
       throw new ApiError(404, "Resource not found.");
     }
-    console.log(resource);
-
     if (
-      !resource.user.equals(req.user._id) ||
+      !(resource.user.equals(req.user._id) || (resource.team.owner.username==req.user.username) )&&
       !req.user.teams.includes(resource.team)
     ) {
       throw new ApiError(

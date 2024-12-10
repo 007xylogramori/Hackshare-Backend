@@ -63,13 +63,34 @@ const likePost = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, post, "Post liked/unliked successfully"));
 });
 
-// Get posts with filtering by tags
-const getPosts = asyncHandler(async (req, res) => {
-    const { tags } = req.query;
+// Get posts with filtering by tags and paginated
+const getPostsPaginated = asyncHandler(async (req, res) => {
+    const { tags, page = 1, limit = 10 } = req.query;
+
     const filter = tags ? { tags: { $in: tags.split(',') } } : {};
-    const posts = await CommunityPost.find(filter).populate('user','profilePicture username').populate('comments.user', 'username',);
-    res.status(200).json(new ApiResponse(200, posts, "Posts fetched successfully"));
+
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const posts = await CommunityPost.find(filter)
+        .populate('user', 'profilePicture username')
+        .populate('comments.user', 'username')
+        .sort({ createdAt: -1 }) // Sort by latest first
+        .skip(skip)
+        .limit(limitNumber);
+    const totalPosts = await CommunityPost.countDocuments(filter);
+
+    res.status(200).json(new ApiResponse(200, {
+        posts,
+        pagination: {
+            currentPage: pageNumber,
+            totalPages: Math.ceil(totalPosts / limitNumber),
+            totalPosts
+        }
+    }, "Posts fetched successfully"));
 });
+
 
 // Get a single post by ID
 const getPostById = asyncHandler(async (req, res) => {
@@ -134,7 +155,7 @@ export {
     addPost,
     addComment,
     likePost,
-    getPosts,
+    getPostsPaginated,
     getPostById,
     deletePost,
     deleteComment

@@ -8,6 +8,7 @@ import {
     getTeamDetails,
     addGithubRepo,
     leaveTeam,
+    deleteGithubRepo
 } from "../controllers/team.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -20,6 +21,7 @@ router.post("/addrepo", verifyJWT, addGithubRepo);
 router.get("/getallteams", verifyJWT, getTeams);
 router.get("/:teamId", verifyJWT, getTeamDetails);
 router.delete("/delete/:teamId", verifyJWT, deleteTeam);
+router.delete("/deleteGithubRepo", verifyJWT,deleteGithubRepo);
 router.post("/leave/:teamId", verifyJWT, leaveTeam);
 
 export default router;

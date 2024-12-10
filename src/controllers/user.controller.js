@@ -85,7 +85,6 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid user credentials");
   }
 
-  console.log(email);
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
     user._id
   );
@@ -220,7 +219,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  console.log("helo");
   const { fullName, email, bio } = req.body;
   if (!fullName || !email) {
     throw new ApiError(400, "All fields are required");
@@ -296,8 +294,7 @@ const deleteProfilePicture = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(new ApiResponse(200, user, "Profile picture deleted successfully"));
-  } catch (error) {
-    console.log(error);
+  } catch (error) { 
     throw new ApiError(500, "Error deleting profile picture");
   }
 });
