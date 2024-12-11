@@ -57,7 +57,20 @@ const updateContactStatus = asyncHandler(async (req, res) => {
 });
 const getContacts = asyncHandler(async (req, res) => {
   try {
-    const contact = await Contact.find({ user: req.user._id });
+    const contact = await Contact.find({ user: req.user._id }).sort({ createdAt: -1 });
+
+    if (!contact) {
+      throw new ApiError(404, "Contact messages not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, contact, "success"));
+  } catch (error) {
+    throw new ApiError(500, "could not get all contacts");
+  }
+});
+const getAllContacts = asyncHandler(async (req, res) => {
+  try {
+    const contact = await Contact.find().populate("user","username fullName" );
 
     if (!contact) {
       throw new ApiError(404, "Contact messages not found");
@@ -69,4 +82,4 @@ const getContacts = asyncHandler(async (req, res) => {
   }
 });
 
-export { createContact, updateContactStatus, getContacts };
+export { createContact, updateContactStatus, getContacts , getAllContacts};
